@@ -3,11 +3,22 @@ name = "warp-server"
 version = "0.1.0"
 edition = "2024"
 
+
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+path = "src/main.rs"
+name = "warp-server"
+
+
 [dependencies]
 actix-web = { version = "4.13.0", features = ["experimental-introspection"] }
 chrono = { version = "0.4.44", features = ["serde"] }
 serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
 uuid = { version = "1.22.0", features = ["v5", "serde"] }
 validator = { version = "0.20.0", features = ["derive"] }
 sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio", "chrono", "uuid"] }
-tokio = "1.50.0"
+tokio = { version = "1.50.0", features = ["full"] }
