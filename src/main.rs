@@ -1,15 +1,14 @@
 use actix_web::{
     App, HttpResponse, HttpServer, Responder,
-    dev::Service,
-    get, post,
-    web::{self, service},
+    web::{self},
 };
 
 use crate::handlers::{
-    auth, commits, files, functions, search, sources, status, symbols, targets, types,
+    auth, commits, files, functions, search, sources, status, symbols, targets, types, users,
 };
 
 mod handlers;
+mod models;
 mod routes;
 
 async fn introspection_handler_text(
@@ -80,7 +79,23 @@ async fn main() -> std::io::Result<()> {
                             .service(types::get_types)
                             .service(types::get_types_data),
                     )
-                    .service(web::scope("users")),
+                    .service(
+                        web::scope("users")
+                            .service(
+                                web::scope("me")
+                                    .service(users::me::get_user)
+                                    .service(users::me::get_keys)
+                                    .service(users::me::create_key),
+                            )
+                            .service(users::query)
+                            .service(users::get_user)
+                            .service(users::create_user)
+                            .service(users::delete_user)
+                            .service(users::get_keys)
+                            .service(users::create_key)
+                            .service(users::change_role)
+                            .service(users::change_username),
+                    ),
             ),
         )
     })

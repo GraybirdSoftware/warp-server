@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, Responder, delete, get, patch, post, web};
 
-mod me;
+pub mod me;
 
 #[post("/query")]
 async fn query() -> impl Responder {
