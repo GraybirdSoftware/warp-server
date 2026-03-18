@@ -24,8 +24,8 @@ pub struct CreateSource {
 
 #[derive(Serialize, Deserialize)]
 pub struct CreateUser {
-    email: String,
-    name: Option<String>,
+    pub email: String,
+    pub name: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
