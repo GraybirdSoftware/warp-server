@@ -1,5 +1,9 @@
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
-pub async fn status_handler() -> impl Responder {
+
+
+
+#[get("/")]
+pub async fn get_status() -> impl Responder {
    HttpResponse::Ok()
 }

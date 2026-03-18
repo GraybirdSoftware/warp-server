@@ -1,13 +1,18 @@
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
 
-async fn login() -> impl Responder {
+
+
+#[post("/login")]
+pub async fn login() -> impl Responder {
    HttpResponse::InternalServerError()
 }
 
-async fn logout() -> impl Responder {
+#[post("/logout")]
+pub async fn logout() -> impl Responder {
    HttpResponse::InternalServerError()
 }
 
-async fn callback() -> impl Responder {
+#[get("/o/callback")]
+pub async fn get_callback() -> impl Responder {
    HttpResponse::InternalServerError()
 }
