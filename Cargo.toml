@@ -5,3 +5,5 @@ edition = "2024"
 
 [dependencies]
 actix-web = { version = "4.13.0", features = ["experimental-introspection"] }
+sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio", "chrono", "uuid"] }
+tokio = "1.50.0"
