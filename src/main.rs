@@ -1,27 +1,20 @@
-use actix_web::{
-    App, HttpResponse, HttpServer, Responder,
-    web::{self},
-};
+use actix_web::{App, HttpServer, web};
 
 use crate::handlers::{
     auth, commits, files, functions, search, sources, status, symbols, targets, types, users,
 };
 
+mod database;
 mod handlers;
 mod models;
 mod routes;
 
-async fn introspection_handler_text(
-    tree: web::Data<actix_web::introspection::IntrospectionTree>,
-) -> impl Responder {
-    let report = tree.report_as_text();
-    HttpResponse::Ok().content_type("text/plain").body(report)
-}
-
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| {
-        App::new().service(
+    let pool = database::create_pool().await;
+
+    HttpServer::new(move || {
+        App::new().app_data(pool.clone()).service(
             web::scope("/api").service(
                 web::scope("/v1")
                     .service(
