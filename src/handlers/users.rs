@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, Responder, delete, get, patch, post, web};
 use chrono::Utc;
 use sqlx::{Pool, Sqlite};
 
-use crate::models::{core::Role, request::CreateUser};
+use crate::models::{core::{Role, User}, request::CreateUser};
 
 pub mod me;
 
@@ -27,7 +27,6 @@ async fn create_user(pool: web::Data<Pool<Sqlite>>, request: web::Json<CreateUse
         .await
         .map_err(actix_web::error::ErrorInternalServerError)?;
 
-
     if !row.is_some() { 
         let id = sqlx::query(
                 "INSERT INTO users (username, email, role, created_at
@@ -35,11 +34,20 @@ async fn create_user(pool: web::Data<Pool<Sqlite>>, request: web::Json<CreateUse
             .bind(&request.name)
             .bind(&request.email)
             .bind(Role::User)
-            .bind(Utc::now().to_rfc3339());
+            .bind(Utc::now().to_rfc3339())
+            .execute(conn)
+            .await
+            .map_err(actix_web::error::ErrorInternalServerError)? //todo; nice errors
+            .last_insert_rowid();
 
-        //TODO; Return response of userdata in json
+        let user: User  = sqlx::query_as("SELECT 1 FROM users WHERE email = ? LIMIT 1")
+            .bind(&request.email)
+            .fetch_one(conn)
+            .await
+            .map_err(actix_web::error::ErrorInternalServerError)?; //todo; nice errors
+        
+        return Ok(HttpResponse::Ok().json(user)); 
     }
-    
     Ok(HttpResponse::InternalServerError().finish())
 
 }
