@@ -1,13 +1,24 @@
 use std::net::TcpListener;
-use actix_web::{App, HttpServer, dev::Server, web};
+use actix_web::{App, HttpResponse, HttpServer, Responder, dev::Server, web};
 use sqlx::{Pool, Sqlite};
 use crate::handlers::{
     auth, commits, files, functions, search, sources, status, symbols, targets, types, users,
 };
 
+
+async fn introspection_handler_text(
+    tree: web::Data<actix_web::introspection::IntrospectionTree>,
+) -> impl Responder {
+    let report = tree.report_as_text();
+    HttpResponse::Ok().content_type("text/plain").body(report)
+}
+
+
 pub fn run(listener: TcpListener, pool: Pool<Sqlite>) -> Result<Server, std::io::Error> { 
     let server = HttpServer::new(move || {
-        App::new().app_data(pool.clone()).service(
+        App::new()
+        .service(web::resource("/introspection").route(web::get().to(introspection_handler_text)))
+        .app_data(pool.clone()).service(
             web::scope("/api").service(
                 web::scope("/v1")
                     .service(

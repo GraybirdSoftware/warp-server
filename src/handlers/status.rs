@@ -4,7 +4,7 @@ use serde_json::json;
 
 
 
-#[get("/")]
+#[get("")]
 pub async fn get_status() -> impl Responder {
    HttpResponse::Ok().json(json!({
       "status": "OK"

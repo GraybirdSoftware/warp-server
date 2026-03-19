@@ -10,7 +10,7 @@ async fn main() -> std::io::Result<()> {
 
     sqlx::migrate!("./migrations").run(&pool).await.unwrap();
 
-    let port = 80;
+    let port = 8080;
     let address = format!("127.0.0.1:{}", port);
     let listener = TcpListener::bind(address)?;
 

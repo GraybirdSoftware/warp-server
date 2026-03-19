@@ -1,5 +1,6 @@
 mod util;
 
+use serde_json::{Value, json};
 use util::start_test_instance;
 
 
@@ -11,11 +12,14 @@ async fn test_status(){
     let client = reqwest::Client::new();
 
     let response = client
-            .get(&format!("{}/api/vi/users", &app.address))
+            .get(&format!("{}/api/v1/status", &app.address))
             .send()
             .await
             .expect("Request failed");
         
     assert!(response.status().is_success());
+
+    let _json: Value = response.json().await.unwrap(); //panic if invalid json
+
     
 }
