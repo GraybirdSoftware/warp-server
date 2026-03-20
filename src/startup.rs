@@ -15,10 +15,14 @@ async fn introspection_handler_text(
 
 
 pub fn run(listener: TcpListener, pool: Pool<Sqlite>) -> Result<Server, std::io::Error> { 
+
+    // pool must be wrapped in Data for shared ownership otherwise you will have a very hard to debug crash
+    let pool_data = web::Data::new(pool);
+
     let server = HttpServer::new(move || {
         App::new()
         .service(web::resource("/introspection").route(web::get().to(introspection_handler_text)))
-        .app_data(pool.clone()).service(
+        .app_data(pool_data.clone()).service(
             web::scope("/api").service(
                 web::scope("/v1")
                     .service(
