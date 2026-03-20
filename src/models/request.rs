@@ -22,7 +22,7 @@ pub struct CreateSource {
     user_ids: Vec<i32>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CreateUser {
     pub email: String,
     pub name: Option<String>,
