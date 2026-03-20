@@ -1,5 +1,5 @@
 -- Add migration script here
-CREATE TABLE api_keys (
+CREATE TABLE api_keys(
     id            INTEGER PRIMARY KEY,
     user_id       INTEGER NOT NULL,
     name          TEXT NOT NULL,
