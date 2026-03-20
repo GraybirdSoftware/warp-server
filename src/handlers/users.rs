@@ -2,7 +2,10 @@ use actix_web::{HttpResponse, Responder, delete, get, patch, post, web};
 use chrono::Utc;
 use sqlx::{Pool, Sqlite};
 
-use crate::models::{core::{Role, User}, request::CreateUser};
+use crate::models::{
+    core::{Role, User},
+    request::CreateUser,
+};
 
 pub mod me;
 
@@ -17,43 +20,46 @@ async fn get_user(id: web::Path<u32>) -> impl Responder {
 }
 
 // NOTE: ALL ROUTES BELOW THIS ARE AUTHENTICATED
-#[post("/")]
-async fn create_user(pool: web::Data<Pool<Sqlite>>, request: web::Json<CreateUser>) -> Result<HttpResponse, actix_web::Error> {
+#[post("")]
+async fn create_user(
+    pool: web::Data<Pool<Sqlite>>,
+    request: web::Json<CreateUser>,
+) -> Result<HttpResponse, actix_web::Error> {
     let conn = pool.get_ref();
 
-    let row = sqlx::query("SELECT 1 FROM users WHERE email = ? LIMIT 1")
-        .bind(&request.email)
-        .fetch_optional(conn)
+    let row = sqlx::query!(
+        "SELECT 1 AS present FROM users WHERE email = ? LIMIT 1",
+        request.email
+    )
+    .fetch_optional(conn)
+    .await
+    .map_err(actix_web::error::ErrorInternalServerError)?;
+
+    if row.is_none() {
+        let created_at = Utc::now().to_rfc3339();
+        let user = sqlx::query_as!(
+            User,
+            r#"
+            INSERT INTO users (username, email, role, created_at)
+            VALUES (?, ?, ?, ?)
+            RETURNING id, username, email, role, created_at
+            "#,
+            request.name,
+            request.email,
+            Role::User,
+            created_at
+        )
+        .fetch_one(conn)
         .await
         .map_err(actix_web::error::ErrorInternalServerError)?;
 
-    if !row.is_some() { 
-        let id = sqlx::query(
-                "INSERT INTO users (username, email, role, created_at
-                VALUES (?1, ?2, ?3, ?4)")
-            .bind(&request.name)
-            .bind(&request.email)
-            .bind(Role::User)
-            .bind(Utc::now().to_rfc3339())
-            .execute(conn)
-            .await
-            .map_err(actix_web::error::ErrorInternalServerError)? //todo; nice errors
-            .last_insert_rowid();
-
-        let user: User  = sqlx::query_as("SELECT 1 FROM users WHERE email = ? LIMIT 1")
-            .bind(&request.email)
-            .fetch_one(conn)
-            .await
-            .map_err(actix_web::error::ErrorInternalServerError)?; //todo; nice errors
-        
-        return Ok(HttpResponse::Ok().json(user)); 
+        return Ok(HttpResponse::Ok().json(user));
     }
     Ok(HttpResponse::InternalServerError().finish())
-
 }
 
 #[delete("/{id}")]
-async fn delete_user(id: web::Path<u32>) -> impl Responder {
+async fn delete_user(pool: web::Data<Pool<Sqlite>>, id: web::Path<u32>) -> impl Responder {
     HttpResponse::NotImplemented()
 }
 
@@ -68,7 +74,7 @@ async fn create_key(id: web::Path<u32>) -> impl Responder {
 }
 
 #[patch("/{id}/role")]
-async fn change_role(id: web::Path<u32>) -> impl Responder {
+async fn change_role(pool: web::Data<Pool<Sqlite>>, id: web::Path<u32>) -> impl Responder {
     HttpResponse::NotImplemented()
 }
 
