@@ -2,7 +2,7 @@
 
 CREATE TABLE users(
     id          INTEGER PRIMARY KEY,
-    username    TEXT NOT NULL,
+    username    TEXT,
     email       TEXT NOT NULL,
     role        TEXT NOT NULL,
     created_at  TEXT NOT NULL
