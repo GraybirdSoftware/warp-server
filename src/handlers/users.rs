@@ -20,6 +20,14 @@ async fn get_user(id: web::Path<u32>) -> impl Responder {
 }
 
 // NOTE: ALL ROUTES BELOW THIS ARE AUTHENTICATED
+#[tracing::instrument(
+    name = "create_user",
+    fields(
+        user_email = ?request.email,
+        user_name = ?request.name
+    ),
+    err
+)]
 #[post("")]
 async fn create_user(
     pool: web::Data<Pool<Sqlite>>,
@@ -36,6 +44,7 @@ async fn create_user(
     .map_err(actix_web::error::ErrorInternalServerError)?;
 
     if row.is_none() {
+        tracing::debug!("user, is none");
         let created_at = Utc::now().to_rfc3339();
         let user = sqlx::query_as!(
             User,
@@ -55,7 +64,8 @@ async fn create_user(
 
         return Ok(HttpResponse::Ok().json(user));
     }
-    Ok(HttpResponse::InternalServerError().finish())
+    
+    Ok(HttpResponse::GatewayTimeout().finish())
 }
 
 #[delete("/{id}")]
