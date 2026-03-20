@@ -1,8 +1,8 @@
 use std::net::TcpListener;
-
-
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
+
+    color_eyre::install().unwrap();
 
     let pool = sqlx::sqlite::SqlitePool::connect("sqlite://sqlite.db?mode=rwc")
         .await
