@@ -1,6 +1,6 @@
 -- Add migration script here
 
-CREATE TABLE users(
+CREATE TABLE users (
     id          INTEGER PRIMARY KEY,
     username    TEXT,
     email       TEXT NOT NULL,
