@@ -64,7 +64,7 @@ async fn create_user(
 
         return Ok(HttpResponse::Ok().json(user));
     }
-    
+
     Ok(HttpResponse::GatewayTimeout().finish())
 }
 

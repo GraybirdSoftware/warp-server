@@ -1,6 +1,4 @@
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-
-
+use actix_web::{HttpResponse, Responder, delete, get, post, web};
 
 #[post("/query")]
 async fn query() -> impl Responder {
@@ -8,11 +6,11 @@ async fn query() -> impl Responder {
 }
 
 #[get("/{id}")]
-async fn get_commit(id: web::Path<(u32,)>) -> impl Responder {
+async fn get_commit(id: web::Path<u32>) -> impl Responder {
     HttpResponse::NotImplemented()
 }
 
 #[delete("/{id}")]
-async fn delete_commit(id: web::Path<(u32,)>) -> impl Responder {
+async fn delete_commit(id: web::Path<u32>) -> impl Responder {
     HttpResponse::NotImplemented()
 }

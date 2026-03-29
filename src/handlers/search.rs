@@ -1,7 +1,6 @@
-use actix_web::{delete, get, patch, post, web, HttpResponse, Responder};
-
+use actix_web::{HttpResponse, Responder, get};
 
 #[get("/")]
 async fn search() -> impl Responder {
-   HttpResponse::NotImplemented()
+    HttpResponse::NotImplemented()
 }
