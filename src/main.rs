@@ -63,7 +63,9 @@ async fn serve(config: Config) -> Result<()> {
         }
     );
 
-    startup::run(listener, pool, config)?.await?;
+    startup::run(listener, pool.clone(), config)?.await?;
+    // Close the pool so SQLite checkpoints the WAL into the main file.
+    pool.close().await;
     Ok(())
 }
 
