@@ -2,3 +2,7 @@
 *.db
 *.db-wal
 *.db-shm
+
+# local deployment files (kept out of the repository on purpose)
+/deploy/
+/.dockerignore
