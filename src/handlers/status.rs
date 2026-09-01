@@ -1,11 +1,10 @@
 use actix_web::{HttpResponse, Responder, get};
-use serde_json::json;
 
-#[tracing::instrument(name = "status")]
+use crate::models::response::StatusResponse;
+
 #[get("")]
 pub async fn get_status() -> impl Responder {
-    tracing::info!("OK");
-    HttpResponse::Ok().json(json!({
-       "status": "OK"
-    }))
+    HttpResponse::Ok().json(StatusResponse {
+        status: "OK".to_string(),
+    })
 }

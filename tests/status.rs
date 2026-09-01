@@ -1,25 +1,29 @@
 mod util;
 
-use serde_json::{Value, json};
-use util::start_test_instance;
-
-
+use util::{json, spawn_app};
 
 #[tokio::test]
-async fn test_status(){ 
-    let app = start_test_instance().await;
+async fn status_reports_ok() {
+    let app = spawn_app().await;
 
-    let client = reqwest::Client::new();
+    let resp = app.get("/api/v1/status").send().await.unwrap();
+    assert!(resp.status().is_success());
+    let body = json(resp).await;
+    assert_eq!(body["status"], "OK");
+}
 
-    let response = client
-            .get(&format!("{}/api/v1/status", &app.address))
-            .send()
-            .await
-            .expect("Request failed");
-        
-    assert!(response.status().is_success());
+#[tokio::test]
+async fn trailing_slashes_are_tolerated() {
+    let app = spawn_app().await;
 
-    let _json: Value = response.json().await.unwrap(); //panic if invalid json
+    let resp = app.get("/api/v1/status/").send().await.unwrap();
+    assert_eq!(resp.status(), 200);
+}
 
-    
+#[tokio::test]
+async fn unknown_routes_are_404() {
+    let app = spawn_app().await;
+
+    let resp = app.get("/api/v1/nope").send().await.unwrap();
+    assert_eq!(resp.status(), 404);
 }
